@@ -1,4 +1,4 @@
-# Wayland Square Connect
+# Wayland Square Connect - Test
 
 Mobile-first local preview for the Wayland Square Merchants Association app.
 
