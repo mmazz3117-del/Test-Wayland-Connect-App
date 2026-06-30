@@ -1,11 +1,11 @@
 {
-  "name": "Wayland Square Connect",
-  "short_name": "WS Connect",
+  "name": "Wayland Square Connect TEST",
+  "short_name": "WS TEST",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0b3b82",
+  "theme_color": "#d97706",
   "icons": [
     {
       "src": "apple-touch-icon.png",
