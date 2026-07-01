@@ -47,12 +47,15 @@ self.addEventListener('message', (event) => {
 
 messaging.onBackgroundMessage((payload) => {
   syncBadgeFromPayload(payload);
-  const title = (payload.notification && payload.notification.title) || 'Wayland Square Connect TEST';
+  const data = payload.data || {};
+  if (data.showBanner === 'false') return;
+  const title = (payload.notification && payload.notification.title) || data.title || 'Wayland Square Connect TEST';
   const options = {
-    body: (payload.notification && payload.notification.body) || 'New update in Wayland Square Connect TEST.',
+    body: (payload.notification && payload.notification.body) || data.body || 'New update in Wayland Square Connect TEST.',
     icon: 'icon-512.png',
     badge: 'apple-touch-icon.png',
-    data: payload.data || {}
+    silent: data.playSound === 'false',
+    data
   };
   self.registration.showNotification(title, options);
 });
