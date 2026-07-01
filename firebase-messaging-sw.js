@@ -13,18 +13,37 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-async function syncBadgeFromPayload(payload) {
-  const raw = payload && payload.data ? payload.data.badgeCount : 0;
-  const count = Math.max(0, Number(raw) || 0);
+async function applyAppBadge(count) {
+  const safe = Math.max(0, Number(count) || 0);
+  try {
+    if (self.registration && 'setAppBadge' in self.registration) {
+      if (safe > 0) await self.registration.setAppBadge(safe);
+      else if ('clearAppBadge' in self.registration) await self.registration.clearAppBadge();
+      return;
+    }
+  } catch (err) {
+    console.warn('Service worker registration badge sync failed', err);
+  }
   try {
     if (self.navigator && 'setAppBadge' in self.navigator) {
-      if (count > 0) await self.navigator.setAppBadge(count);
+      if (safe > 0) await self.navigator.setAppBadge(safe);
       else if ('clearAppBadge' in self.navigator) await self.navigator.clearAppBadge();
     }
   } catch (err) {
-    console.warn('Service worker app badge sync failed', err);
+    console.warn('Service worker navigator badge sync failed', err);
   }
 }
+
+async function syncBadgeFromPayload(payload) {
+  const raw = payload && payload.data ? payload.data.badgeCount : 0;
+  await applyAppBadge(raw);
+}
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'WSC_SYNC_BADGE') {
+    event.waitUntil(applyAppBadge(event.data.count));
+  }
+});
 
 messaging.onBackgroundMessage((payload) => {
   syncBadgeFromPayload(payload);
